@@ -1,0 +1,6 @@
+pandas
+matplotlib
+collections
+streamlit
+plotly
+json
