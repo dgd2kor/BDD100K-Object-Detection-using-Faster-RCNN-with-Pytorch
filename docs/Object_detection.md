@@ -1,3 +1,91 @@
+# **Model Selection and Justification**
+
+## Chosen Model: Faster R-CNN with ResNet-50-FPN
+For object detection on the BDD100K dataset, I have selected **Faster R-CNN with a ResNet-50 Feature Pyramid Network (FPN)** as the base architecture. The model is initialized with **pre-trained weights**, which has been specifically trained for the BDD100K dataset.
+
+## Why Faster R-CNN?
+Faster R-CNN is a **two-stage object detection model** that provides a good balance between accuracy and efficiency. The reasons for choosing this model include:
+
+### **High Detection Accuracy**
+- Faster R-CNN is known for its high accuracy in detecting objects, particularly when dealing with complex urban driving scenarios like BDD100K.
+- It performs well on **small and occluded objects**, which are common in street scenes (e.g., traffic signs, pedestrians, vehicles).
+
+### **Pretrained Weights on BDD100K**
+- Using **pre-trained weights** helps leverage **transfer learning**, reducing training time and improving performance on the dataset.
+- The model has already learned relevant **feature representations from BDD100K**, making it more suitable for fine-tuning.
+
+### **Feature Pyramid Network (FPN) for Multi-Scale Detection**
+- The **ResNet-50-FPN backbone** enhances detection performance by improving feature extraction across different object sizes.
+- This is crucial for detecting **small objects like pedestrians, traffic lights, and signs** in varying lighting conditions.
+
+### **Balance Between Performance and Computational Efficiency**
+- Unlike single-stage detectors like YOLO or SSD, Faster R-CNN excels at precise localization and classification, making it a strong candidate for **POCs, Assessments ** scenarios where quality matters more than speed.
+- While Faster R-CNN is not the fastest object detector, it provides a good **trade-off between accuracy and inference speed**, which is important for applications like **autonomous driving**.
+
+
+# **Key Components of Faster R-CNN**
+
+Faster R-CNN builds upon the success of Fast R-CNN by introducing a novel component: the **Region Proposal Network (RPN)**. The RPN allows the model to generate its own **region proposals**, creating an **end-to-end trainable object detection system**. Below are the key components that make Faster R-CNN so effective.
+
+## **1. Backbone Network**
+The **backbone network** acts as the **feature extractor** for Faster R-CNN. Typically, this is a **pre-trained Convolutional Neural Network (CNN)** such as **ResNet** or **VGG**. This network processes the input image and generates a **feature map**, which encodes **hierarchical visual information**.
+
+- The feature map has a **smaller spatial size** than the input image but retains **deep channel information**.
+- This compact representation is essential for both **region proposal generation** and **object classification** tasks.
+
+## **2. Region Proposal Network (RPN)**
+The **RPN** is the core component of Faster R-CNN, responsible for generating **region proposals**. It is a **fully convolutional network** that takes the **feature map** from the backbone network as input.
+
+### **How RPN Works**
+- The RPN operates by sliding a small **network over the feature map**.
+- At each position in the sliding window, it **predicts multiple region proposals** with associated **classification scores**.
+- It introduces the concept of **anchors**—predefined bounding boxes of various **scales** and **aspect ratios** centered at each location in the feature map.
+
+### **For each anchor, the RPN predicts:**
+1. **Objectness Score** – The probability that the anchor contains an object of interest.
+2. **Bounding Box Refinements** – Adjustments to the anchor’s coordinates to better fit the detected object.
+
+This efficient design allows the RPN to generate high-quality region proposals at multiple **scales and aspect ratios**.
+
+## **3. RoI Pooling Layer**
+The **Region of Interest (RoI) pooling layer** is crucial for handling region proposals of **different sizes**. It ensures that all proposals are converted into **fixed-size feature maps**, making them compatible with the classification and regression layers.
+
+### **How RoI Pooling Works**
+- Each **region proposal** is divided into a **fixed grid** (e.g., **7×7**).
+- A **max-pooling operation** is applied to each grid cell.
+- This process ensures that the output **feature map** has a consistent size (e.g., **7×7×512**).
+
+By doing so, RoI pooling allows Faster R-CNN to efficiently process region proposals of different sizes while maintaining computational efficiency.
+
+## **4. Classification and Bounding Box Regression Heads**
+The final component of Faster R-CNN consists of **two parallel fully connected layers**:
+
+### **1. Classification Head**
+- Uses a **softmax activation** to predict the **object class** for each region proposal.
+
+### **2. Bounding Box Regression Head**
+- Further refines the bounding box coordinates for improved localization accuracy.
+
+### **Loss Function**
+- **Cross-Entropy Loss** – Optimizes the classification accuracy.
+- **Smooth L1 Loss** – Optimizes bounding box regression.
+
+By jointly optimizing both classification and localization, Faster R-CNN effectively detects and localizes objects with high accuracy.
+
+# **The Architecture of Faster R-CNN**  
+
+Faster R-CNN unifies multiple components into a **single network** for efficient object detection. The **workflow** is as follows:  
+
+1. The **input image** is processed through the **backbone CNN**, generating a **feature map**.  
+2. This feature map is passed to the **Region Proposal Network (RPN)** and **RoI Pooling Layer**.  
+3. The **RPN** scans the image with **anchor boxes**, proposing regions based on **classification scores**.  
+4. The **RoI pooling layer** refines these region proposals and prepares them for classification.  
+5. The **Classification Head** predicts the **object class** for each proposal.  
+6. The classification data is then fed into the **Bounding Box Regression Head**, which further **refines coordinates** to yield the **final detection output**.  
+
+This unified design makes Faster R-CNN a highly efficient and accurate object detection model.
+
+
 # Model Performance Evaluation
 
 ## Metrics : Precision, Recall, F1-Score, Mean Average Precision (mAP)
