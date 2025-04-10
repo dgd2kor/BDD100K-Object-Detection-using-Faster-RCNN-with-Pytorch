@@ -25,10 +25,6 @@ The dataset contains the following object categories and their respective counts
 | **Train**      | 136      | Extremely rare class, unlikely to contribute significantly to model learning. |
 
 
-![Training and Validation data distribution](train_val.png)
-![Training data distribution](train.png)
-![Validation data distribution](val.png)
-
 
 ### Observations:  
 **1.Imbalance in Object Categories:**  
