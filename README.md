@@ -38,7 +38,7 @@ Download and Update the Base weights path in config.py in object detection
 ### **1. Train the Model**
 It trains the model with the given hyper parameters in config file.
 ```bash
-python object_detection/train.py --epochs 1 --batch_size 8
+python object_detection/train.py
 ```
 
 ### **2. Run Inference**
