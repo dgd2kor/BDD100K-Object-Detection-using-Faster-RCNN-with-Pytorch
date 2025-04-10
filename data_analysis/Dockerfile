@@ -20,5 +20,5 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 EXPOSE 8888
 
-CMD ["streamlit", "run", "src/dashboard.py", "--server.address=0.0.0.0", "--server.port=8888", "--server.headless=true", "--server.enableCORS=false", "--server.enableXsrfProtection=false", "--allow-root"]
+CMD ["streamlit", "run", "src/dashboard.py", "--server.address=0.0.0.0", "--server.port=8888", "--server.headless=true", "--server.enableCORS=false", "--server.enableXsrfProtection=false"]
 
