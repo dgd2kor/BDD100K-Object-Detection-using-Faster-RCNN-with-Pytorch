@@ -41,7 +41,7 @@ def visualize_image(image_dir,image_name,labels,tag="",save_plot=False):
     plt.title(f"Unique Sample - {tag}: {image_name}")
     plt.axis("off")
     if save_plot:
-        plt.savefig(f"output/visualizations/{image_name_only}_{tag}_vis.jpg")
+        plt.savefig(f"{visuals_output_path}/{image_name_only}_{tag}_vis.jpg")
     plt.show()
 
 
