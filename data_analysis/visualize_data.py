@@ -7,7 +7,9 @@ from analyze_dataset import get_unique_images, get_occluded_truncated
 from parse_json import load_annotations
 from data_config import Config
 
-def visualize_image(image_dir,image_name,labels,tag="",save_plot=False):
+config = Config()
+
+def visualize_image(image_dir,image_name,labels,tag=""):
     """
     Visualizes an image with bounding boxes and category labels.
     
@@ -15,15 +17,13 @@ def visualize_image(image_dir,image_name,labels,tag="",save_plot=False):
         image_dir (str): Directory containing the image.
         image_name (str): Name of the image file.
         labels (list): List of object annotations for the image.
-        tag (str, optional): Category tag for the image. Defaults to "".
-        save_plot (bool, optional): If True, saves the visualization. Defaults to False.
-    
+        tag (str, optional): Category tag for the image. Defaults to "".    
     Returns:
         None: Displays the image with overlaid bounding boxes.
     """
     image_path = os.path.join(image_dir, image_name)
     img = cv2.imread(image_path)
-    img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+    # img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
     
     for label in labels:
 #         print(label)
@@ -36,14 +36,11 @@ def visualize_image(image_dir,image_name,labels,tag="",save_plot=False):
             cv2.putText(img, class_, (x1, max(10, y1-5)),cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0,0,255), 2)
     
     image_name_only = str(image_name).split(".")[0]
-    plt.figure(figsize=(8, 6))
-    plt.imshow(img)
-    plt.title(f"Unique Sample - {tag}: {image_name}")
-    plt.axis("off")
-    if save_plot:
-        plt.savefig(f"{visuals_output_path}/{image_name_only}_{tag}_vis.jpg")
-    plt.show()
-
+    folder_name = os.path.join(config.visuals_output_path,tag)
+    if not os.path.exists(folder_name):
+        os.makedirs(folder_name)
+    output_path = folder_name + f"/{image_name_only}_vis.jpg"
+    cv2.imwrite(output_path, img)
 
 def visualize_unique_images(train_image_path, train_annotations, num_visuals):
     """
@@ -69,19 +66,16 @@ def visualize_unique_images(train_image_path, train_annotations, num_visuals):
                                               rare_objects=rare_objects,
                                               crowded_scene_objects_threshold=crowded_scene_objects_threshold,
                                               large_bb_threshold=large_bb_threshold)
-    unique_images_in_val = get_unique_images(val_annotations,
-                                              rare_objects=rare_objects,
-                                              crowded_scene_objects_threshold=crowded_scene_objects_threshold,
-                                              large_bb_threshold=large_bb_threshold)
+
     for r in range(num_visuals):
         r_images, r_labels = unique_images_in_train["rare_objects"][r],unique_images_in_train["rare_objects_labels"][r]
-        visualize_image(train_image_path, r_images, r_labels,tag="rare_images",save_plot=True)
+        visualize_image(train_image_path, r_images, r_labels,tag="rare_images")
 
         c_images, c_labels = unique_images_in_train["crowded_scenes"][r],unique_images_in_train["crowded_scenes_labels"][r]
-        visualize_image(train_image_path, c_images, c_labels, tag="crowded_scenes",save_plot=True)
+        visualize_image(train_image_path, c_images, c_labels, tag="crowded_scenes")
 
         l_images, l_labels = unique_images_in_train["large_bbox"][r],unique_images_in_train["large_bbox_labels"][r]
-        visualize_image(train_image_path, l_images, l_labels, tag="large_bbox",save_plot=True)
+        visualize_image(train_image_path, l_images, l_labels, tag="large_bbox")
 
 
 def visualize_occluded_truncated(train_image_path, train_annotations, num_visuals):
@@ -99,18 +93,22 @@ def visualize_occluded_truncated(train_image_path, train_annotations, num_visual
     occluded_truncated_samples = get_occluded_truncated(annotations=train_annotations)
     for i in range(num_visuals):
         t_images, t_labels = occluded_truncated_samples["truncated_samples"][i],occluded_truncated_samples["truncated_samples_labels"][i]
-        visualize_image(train_image_path, t_images, t_labels, tag="truncated",save_plot=True)
+        visualize_image(train_image_path, t_images, t_labels, tag="truncated")
 
         o_images, o_labels = occluded_truncated_samples["occluded_samples"][i],occluded_truncated_samples["occluded_samples_labels"][i]
-        visualize_image(train_image_path, o_images, o_labels, tag="occluded",save_plot=True)
+        visualize_image(train_image_path, o_images, o_labels, tag="occluded")
 
+def visualize_all_groundtruths(train_image_path, train_annotations, num_visuals):
+    """
+    """
+    images = []
+    train_labels = []
+    for entry in train_annotations:
+        image_name = entry["name"]
+        labels = entry["labels"]
 
-if __name__=='__main__':
-    config = Config()
-
-    train_annotations = load_annotations(config.train_annotations)
-    val_annotations = load_annotations(config.val_annotations)
-
-    visualize_unique_images(config.train_image_path, config.train_annotations, config.num_visuals)
-
-    visualize_occluded_truncated(config.train_image_path, config.train_annotations, config.num_visuals)
+        images.append(image_name)
+        train_labels.append(labels)
+    for i in range(num_visuals):
+        visualize_image(train_image_path, images[i], train_labels[i], tag="all_training_visuals")
+    
