@@ -1,0 +1,1 @@
+output predictions.json file and predicted visualizations saves here in output folder.
